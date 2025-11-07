@@ -132,6 +132,7 @@ All colors MUST be HSL.
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     animation: glow-pulse 3s ease-in-out infinite;
+    pointer-events: none;
   }
   
   @keyframes glow-pulse {
@@ -156,6 +157,7 @@ All colors MUST be HSL.
   
   .game-board-grid {
     display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 0.5rem;
     padding: 1rem;
   }
