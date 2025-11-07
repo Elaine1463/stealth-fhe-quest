@@ -1,10 +1,40 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/fhe-logo.png";
+import { Wallet } from "lucide-react";
 
 export const Header = () => {
+  const [isConnected, setIsConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const { toast } = useToast();
+
   const handleConnectWallet = () => {
-    // Rainbow Wallet connection logic will go here
-    console.log("Connecting Rainbow Wallet...");
+    // Simulate wallet connection
+    toast({
+      title: "Connecting to Rainbow Wallet...",
+      description: "Please approve the connection in your wallet",
+    });
+
+    setTimeout(() => {
+      const mockAddress = "0x" + Math.random().toString(16).slice(2, 10);
+      setWalletAddress(mockAddress);
+      setIsConnected(true);
+      
+      toast({
+        title: "Wallet Connected!",
+        description: `Connected to ${mockAddress}`,
+      });
+    }, 1500);
+  };
+
+  const handleDisconnect = () => {
+    setIsConnected(false);
+    setWalletAddress("");
+    toast({
+      title: "Wallet Disconnected",
+      description: "You have been disconnected from Rainbow Wallet",
+    });
   };
 
   return (
@@ -19,12 +49,25 @@ export const Header = () => {
             </div>
           </div>
           
-          <Button 
-            onClick={handleConnectWallet}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-          >
-            Connect Rainbow Wallet
-          </Button>
+          {isConnected ? (
+            <Button 
+              onClick={handleDisconnect}
+              variant="outline"
+              className="gap-2"
+            >
+              <Wallet className="h-4 w-4" />
+              <span className="hidden sm:inline">{walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}</span>
+              <span className="sm:hidden">Connected</span>
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleConnectWallet}
+              className="gap-2"
+            >
+              <Wallet className="h-4 w-4" />
+              Connect Wallet
+            </Button>
+          )}
         </div>
       </div>
     </header>

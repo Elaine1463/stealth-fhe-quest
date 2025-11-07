@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Lock, Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 type TileState = "hidden" | "revealed" | "active";
 
@@ -18,7 +20,9 @@ export const GameBoard = () => {
   );
 
   const [currentTurn, setCurrentTurn] = useState(1);
-  const [encryptedMoves, setEncryptedMoves] = useState(0);
+  const { toast } = useToast();
+
+  const activeTiles = tiles.filter(tile => tile.state === "active");
 
   const handleTileClick = (id: number) => {
     setTiles((prev) =>
@@ -28,7 +32,50 @@ export const GameBoard = () => {
           : tile
       )
     );
-    setEncryptedMoves((prev) => prev + 1);
+  };
+
+  const handleSubmitMove = () => {
+    if (activeTiles.length === 0) {
+      toast({
+        title: "No moves selected",
+        description: "Please select at least one tile before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Move encrypted & submitted!",
+      description: `${activeTiles.length} tiles encrypted on-chain. Advancing to next turn...`,
+    });
+
+    // Simulate move submission and turn advancement
+    setTimeout(() => {
+      setTiles((prev) =>
+        prev.map((tile) =>
+          tile.state === "active" ? { ...tile, state: "revealed" } : tile
+        )
+      );
+      setCurrentTurn((prev) => prev + 1);
+      
+      toast({
+        title: "Turn complete",
+        description: `Turn ${currentTurn + 1} starting. Plan your next move!`,
+      });
+    }, 1500);
+  };
+
+  const handleResetMoves = () => {
+    setTiles((prev) =>
+      prev.map((tile) =>
+        tile.state === "active" ? { ...tile, state: "hidden" } : tile
+      )
+    );
+    
+    toast({
+      title: "Moves reset",
+      description: "All selected tiles have been cleared.",
+    });
   };
 
   return (
@@ -43,7 +90,7 @@ export const GameBoard = () => {
             <div className="flex gap-6 text-sm">
               <div className="flex items-center gap-2">
                 <Lock className="h-4 w-4 text-primary" />
-                <span className="text-foreground">{encryptedMoves} Encrypted Moves</span>
+                <span className="text-foreground">{activeTiles.length} Selected Tiles</span>
               </div>
               <div className="flex items-center gap-2">
                 <EyeOff className="h-4 w-4 text-accent" />
@@ -80,12 +127,20 @@ export const GameBoard = () => {
           </div>
 
           <div className="flex gap-4">
-            <button className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all">
+            <Button 
+              onClick={handleSubmitMove}
+              className="flex-1"
+              size="lg"
+            >
               Submit Encrypted Move
-            </button>
-            <button className="px-6 py-3 bg-muted text-foreground rounded-lg font-semibold hover:bg-muted/80 transition-all">
+            </Button>
+            <Button 
+              onClick={handleResetMoves}
+              variant="secondary"
+              size="lg"
+            >
               Reset Moves
-            </button>
+            </Button>
           </div>
 
           <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
